@@ -2,12 +2,14 @@
   "name": "frontend",
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://alejandrogaratejo665-hash.github.io",
+  "homepage": "https://alejandrogaratejo665-hash.github.io/agencia.github.io",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "axios": "^1.18.1",

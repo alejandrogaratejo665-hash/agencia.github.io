@@ -20,7 +20,7 @@ const Login = () => {
       await login(formData.email, formData.password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.mensaje || 'Error al iniciar sesión');
+      setError(err.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }

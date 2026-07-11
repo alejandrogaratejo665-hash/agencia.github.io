@@ -1,7 +1,8 @@
 
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaStar, FaCheckCircle, FaCalendar, FaUsers, FaCamera, FaHeart, FaShareAlt } from 'react-icons/fa';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaMapMarkerAlt, FaStar, FaCheckCircle, FaCalendar, FaUsers, FaCamera, FaHeart, FaShareAlt, FaTimes, FaCalendarAlt, FaCheck } from 'react-icons/fa';
 
 const PAQUETES_DATA = [
   {
@@ -187,6 +188,16 @@ const PAQUETES_DATA = [
 const DetallePaquete = () => {
   const { id } = useParams();
   const paquete = PAQUETES_DATA.find(p => p.id === parseInt(id));
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    fechaInicio: '',
+    fechaFin: '',
+    personas: 2,
+    nombre: '',
+    email: '',
+    telefono: ''
+  });
 
   if (!paquete) {
     return (
@@ -201,8 +212,201 @@ const DetallePaquete = () => {
     );
   }
 
+  const handleBookingSubmit = (e) => {
+    e.preventDefault();
+    // Mock booking save
+    const reservas = JSON.parse(localStorage.getItem('reservas') || '[]');
+    reservas.push({
+      id: Date.now(),
+      paquete: paquete.nombre,
+      ...bookingData,
+      fechaReserva: new Date().toISOString()
+    });
+    localStorage.setItem('reservas', JSON.stringify(reservas));
+    setBookingSuccess(true);
+  };
+
+  const resetBooking = () => {
+    setBookingSuccess(false);
+    setBookingData({
+      fechaInicio: '',
+      fechaFin: '',
+      personas: 2,
+      nombre: '',
+      email: '',
+      telefono: ''
+    });
+    setBookingModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-black">
+      {/* Booking Modal */}
+      <AnimatePresence>
+        {bookingModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setBookingModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative bg-[#111111] border border-gray-800 rounded-2xl w-full max-w-lg overflow-hidden"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-gray-800">
+                <h2 className="text-2xl font-black text-white">
+                  {bookingSuccess ? '¡Reserva confirmada!' : 'Consultar disponibilidad'}
+                </h2>
+                <button
+                  onClick={resetBooking}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  <FaTimes size={24} />
+                </button>
+              </div>
+
+              <div className="p-6">
+                {bookingSuccess ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center"
+                  >
+                    <div className="w-20 h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <FaCheck className="text-gold text-4xl" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      ¡Tu solicitud ha sido enviada!
+                    </h3>
+                    <p className="text-white/60 mb-6">
+                      Te contactaremos pronto para confirmar tu reserva del paquete {paquete.nombre}.
+                    </p>
+                    <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-4 text-left mb-6">
+                      <p className="text-white/80 mb-2">
+                        <span className="font-semibold text-white">Paquete:</span> {paquete.nombre}
+                      </p>
+                      <p className="text-white/80 mb-2">
+                        <span className="font-semibold text-white">Fechas:</span> {bookingData.fechaInicio} - {bookingData.fechaFin}
+                      </p>
+                      <p className="text-white/80">
+                        <span className="font-semibold text-white">Personas:</span> {bookingData.personas}
+                      </p>
+                    </div>
+                    <button
+                      onClick={resetBooking}
+                      className="w-full bg-gold text-black py-3 font-bold rounded-xl hover:bg-gold/90 transition-all"
+                    >
+                      Cerrar
+                    </button>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleBookingSubmit} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-white/80 mb-2 flex items-center gap-2">
+                          <FaCalendarAlt className="text-gold" />
+                          Fecha de inicio
+                        </label>
+                        <input
+                          type="date"
+                          required
+                          min={new Date().toISOString().split('T')[0]}
+                          value={bookingData.fechaInicio}
+                          onChange={(e) => setBookingData({ ...bookingData, fechaInicio: e.target.value })}
+                          className="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-gold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-white/80 mb-2 flex items-center gap-2">
+                          <FaCalendarAlt className="text-gold" />
+                          Fecha de fin
+                        </label>
+                        <input
+                          type="date"
+                          required
+                          min={bookingData.fechaInicio || new Date().toISOString().split('T')[0]}
+                          value={bookingData.fechaFin}
+                          onChange={(e) => setBookingData({ ...bookingData, fechaFin: e.target.value })}
+                          className="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-gold"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-white/80 mb-2 flex items-center gap-2">
+                        <FaUsers className="text-gold" />
+                        Número de personas
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        required
+                        value={bookingData.personas}
+                        onChange={(e) => setBookingData({ ...bookingData, personas: parseInt(e.target.value) })}
+                        className="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-gold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-white/80 mb-2">
+                        Nombre completo
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={bookingData.nombre}
+                        onChange={(e) => setBookingData({ ...bookingData, nombre: e.target.value })}
+                        className="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-gold"
+                        placeholder="Tu nombre"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-white/80 mb-2">
+                        Correo electrónico
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={bookingData.email}
+                        onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
+                        className="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-gold"
+                        placeholder="tu@email.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-white/80 mb-2">
+                        Teléfono
+                      </label>
+                      <input
+                        type="tel"
+                        value={bookingData.telefono}
+                        onChange={(e) => setBookingData({ ...bookingData, telefono: e.target.value })}
+                        className="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-gold"
+                        placeholder="Tu teléfono"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full bg-gold text-black py-4 font-black rounded-xl hover:bg-gold/90 transition-all text-lg"
+                    >
+                      Enviar solicitud
+                    </button>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       {/* Hero Section */}
       <section className="relative h-[70vh] overflow-hidden">
         <img 
@@ -419,10 +623,16 @@ const DetallePaquete = () => {
                       <p className="text-white font-bold">{paquete.numeroPersonas}</p>
                     </div>
                   </div>
-                  <button className="w-full text-center bg-gold text-black py-4 px-6 rounded-xl font-black hover:bg-gold/90 transition-all duration-300 shadow-lg hover:shadow-xl text-lg">
+                  <button
+                    onClick={() => setBookingModalOpen(true)}
+                    className="w-full text-center bg-gold text-black py-4 px-6 rounded-xl font-black hover:bg-gold/90 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
+                  >
                     Reservar Ahora
                   </button>
-                  <button className="w-full text-center border-2 border-white text-white py-4 px-6 rounded-xl font-bold hover:bg-white hover:text-black transition-all duration-300 text-lg">
+                  <button
+                    onClick={() => setBookingModalOpen(true)}
+                    className="w-full text-center border-2 border-white text-white py-4 px-6 rounded-xl font-bold hover:bg-white hover:text-black transition-all duration-300 text-lg"
+                  >
                     Consultar disponibilidad
                   </button>
                   <Link
