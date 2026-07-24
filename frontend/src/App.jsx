@@ -42,7 +42,7 @@ const ProtectedAdminRoute = ({ children }) => {
 
 function App() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.includes('/admin');
 
   return (
     <div className="min-h-screen flex flex-col">

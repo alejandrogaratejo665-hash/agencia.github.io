@@ -96,11 +96,17 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <p className="text-white/60">
               ¿No tienes cuenta?{' '}
               <Link to="/register" className="text-gold font-bold hover:underline">
                 Regístrate aquí
+              </Link>
+            </p>
+            <p className="text-white/40 text-sm">
+              ¿Eres administrador?{' '}
+              <Link to="/admin/login" className="text-gold/70 font-semibold hover:text-gold hover:underline">
+                Ir al panel de administración
               </Link>
             </p>
           </div>

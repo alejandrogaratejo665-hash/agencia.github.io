@@ -305,11 +305,8 @@ export const AdminProvider = ({ children }) => {
   // Initialize data from localStorage or use defaults
   useEffect(() => {
     try {
-      // Initialize admin credentials
-      const storedAdminCredentials = localStorage.getItem('adminCredentials');
-      if (!storedAdminCredentials) {
-        localStorage.setItem('adminCredentials', JSON.stringify(DEFAULT_ADMIN_CREDENTIALS));
-      }
+      // Always set admin credentials to default (to avoid any stored wrong credentials)
+      localStorage.setItem('adminCredentials', JSON.stringify(DEFAULT_ADMIN_CREDENTIALS));
       
       // Initialize destinos
       const storedDestinos = localStorage.getItem('destinos');
@@ -356,16 +353,27 @@ export const AdminProvider = ({ children }) => {
 
   const adminLogin = (email, password) => {
     try {
+      console.log('adminLogin called with:', { email, password });
       const storedCredentials = JSON.parse(localStorage.getItem('adminCredentials'));
+      console.log('Stored credentials:', storedCredentials);
+      console.log('Comparing email:', {
+        emailLower: email.toLowerCase(),
+        storedEmailLower: storedCredentials.email.toLowerCase(),
+        passwordMatch: password === storedCredentials.password
+      });
+      
       if (email.toLowerCase() === storedCredentials.email.toLowerCase() && password === storedCredentials.password) {
         const adminData = { email: storedCredentials.email };
         setAdmin(adminData);
         setIsAdminLoggedIn(true);
         localStorage.setItem('adminLoggedIn', JSON.stringify(adminData));
+        console.log('Login successful');
         return { success: true };
       }
+      console.log('Login failed');
       return { success: false, message: 'Credenciales incorrectas' };
     } catch (err) {
+      console.error('Error in adminLogin:', err);
       return { success: false, message: 'Error al iniciar sesión' };
     }
   };
