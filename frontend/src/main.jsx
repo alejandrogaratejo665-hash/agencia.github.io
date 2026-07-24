@@ -9,7 +9,7 @@ import { AdminProvider } from './contexts/AdminContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/agencia.github.io">
       <AdminProvider>
         <AuthProvider>
           <FavoritesProvider>
