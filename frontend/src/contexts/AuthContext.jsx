@@ -6,24 +6,45 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [usuariosRegistrados, setUsuariosRegistrados] = useState(() => {
-    const saved = localStorage.getItem('usuarios');
-    return saved ? JSON.parse(saved) : [];
-  });
 
-  useEffect(() => {
-    const usuarioStorage = localStorage.getItem('usuario');
-    if (usuarioStorage) {
-      setUsuario(JSON.parse(usuarioStorage));
+  // Helper to get users from localStorage safely
+  const getUsuariosRegistrados = () => {
+    try {
+      const saved = localStorage.getItem('usuarios');
+      return saved ? JSON.parse(saved) : [];
+    } catch (err) {
+      console.error('Error reading usuarios from localStorage:', err);
+      return [];
     }
-    setLoading(false);
+  };
+
+  // Initialize state from localStorage
+  useEffect(() => {
+    try {
+      const usuarioStorage = localStorage.getItem('usuario');
+      if (usuarioStorage) {
+        setUsuario(JSON.parse(usuarioStorage));
+      }
+    } catch (err) {
+      console.error('Error reading usuario from localStorage:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const login = async (email, password) => {
-    // Mock login
-    const usuarioEncontrado = usuariosRegistrados.find(u => u.email === email && u.password === password);
+    const usuariosRegistrados = getUsuariosRegistrados();
+    const usuarioEncontrado = usuariosRegistrados.find(
+      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+    
     if (usuarioEncontrado) {
-      const userData = { id: usuarioEncontrado.id, nombre: usuarioEncontrado.nombre, email: usuarioEncontrado.email, telefono: usuarioEncontrado.telefono };
+      const userData = { 
+        id: usuarioEncontrado.id, 
+        nombre: usuarioEncontrado.nombre, 
+        email: usuarioEncontrado.email, 
+        telefono: usuarioEncontrado.telefono 
+      };
       localStorage.setItem('usuario', JSON.stringify(userData));
       setUsuario(userData);
       return { usuario: userData, token: 'mock-token' };
@@ -33,16 +54,31 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (nombre, email, password, telefono) => {
-    // Mock register
-    const usuarioExistente = usuariosRegistrados.find(u => u.email === email);
+    const usuariosRegistrados = getUsuariosRegistrados();
+    const usuarioExistente = usuariosRegistrados.find(
+      u => u.email.toLowerCase() === email.toLowerCase()
+    );
+    
     if (usuarioExistente) {
       throw new Error('El correo electrónico ya está registrado.');
     }
-    const nuevoUsuario = { id: Date.now(), nombre, email, password, telefono };
+    
+    const nuevoUsuario = { 
+      id: Date.now(), 
+      nombre, 
+      email: email.toLowerCase(), 
+      password, 
+      telefono 
+    };
     const nuevosUsuarios = [...usuariosRegistrados, nuevoUsuario];
-    setUsuariosRegistrados(nuevosUsuarios);
+    
     localStorage.setItem('usuarios', JSON.stringify(nuevosUsuarios));
-    const userData = { id: nuevoUsuario.id, nombre, email, telefono };
+    const userData = { 
+      id: nuevoUsuario.id, 
+      nombre, 
+      email: email.toLowerCase(), 
+      telefono 
+    };
     localStorage.setItem('usuario', JSON.stringify(userData));
     setUsuario(userData);
     return { usuario: userData, token: 'mock-token' };
