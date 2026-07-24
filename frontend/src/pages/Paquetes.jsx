@@ -1,112 +1,47 @@
-
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaCalendar, FaStar, FaSearch, FaArrowRight, FaFilter, FaCheckCircle } from 'react-icons/fa';
-
-const PAQUETES_DATA = [
-  {
-    id: 1,
-    nombre: 'Paquete Cartagena Completa',
-    descripcion: 'Todo incluido: alojamiento en hotel 5 estrellas, tours por la ciudad amurallada, Islas del Rosario, desayuno buffet y transporte privado.',
-    duracion_dias: 5,
-    precio: 2500000,
-    descuento: 10,
-    calificacion: 4.9,
-    numeroResenas: 654,
-    imagen: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?q=80&w=1600&auto=format&fit=crop',
-    destacado: true,
-    highlights: ['Hotel 5 Estrellas', 'Islas del Rosario', 'Transporte Privado', 'Desayuno Buffet']
-  },
-  {
-    id: 2,
-    nombre: 'Aventura Medellín y Guatapé',
-    descripcion: 'Descubre la Ciudad de la Eterna Primavera, Comuna 13, Plaza Botero y la impresionante Piedra del Peñol en Guatapé.',
-    duracion_dias: 4,
-    precio: 1800000,
-    descuento: 0,
-    calificacion: 4.7,
-    numeroResenas: 432,
-    imagen: 'https://images.unsplash.com/photo-1645566816086-e6093c472c6e?q=80&w=1600&auto=format&fit=crop',
-    destacado: true,
-    highlights: ['Comuna 13', 'Piedra del Peñol', 'Plaza Botero', 'Metrocable']
-  },
-  {
-    id: 3,
-    nombre: 'Paraíso en San Andrés',
-    descripcion: 'Playas de arena blanca, mar de 7 colores, tours por Johnny Cay y Cayo Acuario, todo incluido en resort frente al mar.',
-    duracion_dias: 5,
-    precio: 3200000,
-    descuento: 15,
-    calificacion: 4.9,
-    numeroResenas: 789,
-    imagen: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?q=80&w=1600&auto=format&fit=crop',
-    destacado: true,
-    highlights: ['Resort Frente al Mar', 'Johnny Cay', 'Cayo Acuario', 'Todo Incluido']
-  },
-  {
-    id: 4,
-    nombre: 'Explorando Tayrona',
-    descripcion: 'Parque Nacional Tayrona, playas vírgenes, senderos de naturaleza y la legendaria Ciudad Perdida en una aventura única.',
-    duracion_dias: 6,
-    precio: 2800000,
-    descuento: 5,
-    calificacion: 4.8,
-    numeroResenas: 543,
-    imagen: 'https://images.unsplash.com/photo-1582674200075-38c560979004?q=80&w=1600&auto=format&fit=crop',
-    destacado: false,
-    highlights: ['Parque Tayrona', 'Ciudad Perdida', 'Senderos Naturaleza', 'Cabañas Eco']
-  },
-  {
-    id: 5,
-    nombre: 'Cancún Todo Incluido',
-    descripcion: 'Resort de lujo en Cancún, Playa del Carmen, tours por cenotes y la zona arqueológica de Tulum en el Caribe mexicano.',
-    duracion_dias: 7,
-    precio: 1800,
-    moneda: 'USD',
-    descuento: 20,
-    calificacion: 4.6,
-    numeroResenas: 876,
-    imagen: 'https://images.unsplash.com/photo-1552074284-5e88ef1aef18?q=80&w=1600&auto=format&fit=crop',
-    destacado: true,
-    highlights: ['Resort de Lujo', 'Cenotes', 'Tulum', 'Playa del Carmen']
-  },
-  {
-    id: 6,
-    nombre: 'Ruta del Café Eje Cafetero',
-    descripcion: 'Salento, Filandia, Valle del Cocora con sus palmeras de cera gigantes y fincas cafeteras tradicionales del Quindío.',
-    duracion_dias: 4,
-    precio: 1600000,
-    descuento: 0,
-    calificacion: 4.9,
-    numeroResenas: 321,
-    imagen: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop',
-    destacado: false,
-    highlights: ['Valle del Cocora', 'Fincas Cafeteras', 'Salento', 'Filandia']
-  }
-];
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { FaCalendar, FaStar, FaSearch, FaArrowRight, FaFilter, FaCheckCircle } from 'react-icons/fa'
+import { useAdmin } from '../contexts/AdminContext'
 
 const Paquetes = () => {
-  const [busqueda, setBusqueda] = useState('');
+  const { paquetes } = useAdmin()
+  const [busqueda, setBusqueda] = useState('')
 
-  const paquetesFiltrados = PAQUETES_DATA.filter(paquete => 
+  const paquetesFiltrados = paquetes.filter(paquete =>
     paquete.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    paquete.descripcion.toLowerCase().includes(busqueda.toLowerCase())
-  );
+    (paquete.descripcion && paquete.descripcion.toLowerCase().includes(busqueda.toLowerCase()))
+  )
+
+  const getPriceDisplay = (precio) => {
+    if (!precio) return ''
+    if (precio.moneda === 'COP') {
+      return `$${precio.valor.toLocaleString('es-CO')}`
+    }
+    return `$${precio.valor.toLocaleString('en-US')} ${precio.moneda}`
+  }
+
+  const getOldPriceDisplay = (precio) => {
+    if (!precio) return ''
+    if (precio.moneda === 'COP') {
+      return `$${precio.valor.toLocaleString('es-CO')}`
+    }
+    return `$${precio.valor.toLocaleString('en-US')} ${precio.moneda}`
+  }
 
   return (
     <div className="min-h-screen bg-black">
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ 
+          style={{
             backgroundImage: 'url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop)'
           }}
         >
           <div className="absolute inset-0 bg-black/75"></div>
         </div>
-        
+
         <div className="relative z-10 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -163,16 +98,16 @@ const Paquetes = () => {
                   className="bg-[#111111] overflow-hidden cursor-pointer group border border-gray-800"
                 >
                   <div className="relative h-72 overflow-hidden">
-                    <img 
-                      src={paquete.imagen} 
+                    <img
+                      src={paquete.imagen}
                       alt={paquete.nombre}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                    {paquete.descuento > 0 && (
+                    {paquete.precioAntes && (
                       <div className="absolute top-6 left-6">
                         <span className="bg-red-600 text-white px-5 py-2 text-xs font-black tracking-wider uppercase">
-                          -{paquete.descuento}% OFF
+                          -20% OFF
                         </span>
                       </div>
                     )}
@@ -181,46 +116,25 @@ const Paquetes = () => {
                     <h3 className="text-xl font-black text-white mb-3">{paquete.nombre}</h3>
                     <div className="flex items-center gap-2 mb-4">
                       <FaCalendar className="text-gold text-sm" />
-                      <p className="text-white/50 text-sm tracking-wide">{paquete.duracion_dias} días</p>
-                    </div>
-                    <p className="text-white/50 mb-6 line-clamp-2 text-sm">
-                      {paquete.descripcion}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {paquete.highlights.map((highlight, i) => (
-                        <div key={i} className="flex items-center gap-1 text-xs text-white/60">
-                          <FaCheckCircle className="text-gold text-xs" />
-                          {highlight}
-                        </div>
-                      ))}
+                      <p className="text-white/50 text-sm tracking-wide">{paquete.duracion}</p>
                     </div>
                     <div className="flex items-center gap-1 mb-6">
                       <FaStar className="text-gold" />
-                      <span className="text-white font-bold">{paquete.calificacion}</span>
-                      <span className="text-white/40">({paquete.numeroResenas} reseñas)</span>
+                      <span className="text-white font-bold">{paquete.rating}</span>
+                      <span className="text-white/40">({paquete.reviews} reseñas)</span>
                     </div>
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-baseline gap-2">
-                        {paquete.descuento > 0 && (
+                        {paquete.precioAntes && (
                           <span className="text-white/30 line-through text-sm">
-                            {paquete.moneda === 'COP'
-                              ? `$${paquete.precio.toLocaleString('es-CO')}`
-                              : `$${paquete.precio.toLocaleString('en-US')} ${paquete.moneda}`}
+                            {getOldPriceDisplay(paquete.precioAntes)}
                           </span>
                         )}
                         <span className="text-gold font-black text-2xl">
-                          {paquete.moneda === 'COP'
-                            ? `$${(paquete.descuento > 0 ? paquete.precio * (1 - paquete.descuento / 100) : paquete.precio).toLocaleString('es-CO')}`
-                            : `$${(paquete.descuento > 0 ? paquete.precio * (1 - paquete.descuento / 100) : paquete.precio).toLocaleString('en-US')} ${paquete.moneda || 'COP'}`}
+                          {getPriceDisplay(paquete.precio)}
                         </span>
                         <span className="text-white/40 text-sm">/persona</span>
                       </div>
-                      <Link
-                        to={`/paquetes/${paquete.id}`}
-                        className="text-gold font-black flex items-center gap-2 group-hover:gap-3 transition-all duration-300 text-sm"
-                      >
-                        Ver más <FaArrowRight />
-                      </Link>
                     </div>
                     <Link
                       to={`/paquetes/${paquete.id}`}
@@ -236,7 +150,7 @@ const Paquetes = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default Paquetes;
+export default Paquetes

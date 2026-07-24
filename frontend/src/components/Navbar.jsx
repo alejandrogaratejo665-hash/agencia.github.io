@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FaPlane, FaUser, FaBars, FaTimes, FaHeart } from 'react-icons/fa';
+import { FaPlane, FaUser, FaBars, FaTimes, FaHeart, FaUserShield } from 'react-icons/fa';
 
 const Navbar = () => {
   const { usuario, logout } = useAuth();
@@ -42,6 +42,10 @@ const Navbar = () => {
             <Link to="/paquetes" className="text-white/80 hover:text-gold transition-colors font-semibold tracking-wide">Paquetes</Link>
             <Link to="/nosotros" className="text-white/80 hover:text-gold transition-colors font-semibold tracking-wide">Nosotros</Link>
             <Link to="/contacto" className="text-white/80 hover:text-gold transition-colors font-semibold tracking-wide">Contacto</Link>
+            <Link to="/admin/login" className="text-white/80 hover:text-gold transition-colors font-semibold tracking-wide flex items-center gap-2">
+              <FaUserShield className="h-4 w-4" />
+              Admin
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
@@ -124,6 +128,13 @@ const Navbar = () => {
               className="block text-white/80 hover:text-gold font-semibold py-2 tracking-wide"
             >
               CONTACTO
+            </Link>
+            <Link
+              to="/admin/login"
+              onClick={() => setIsMenuOpen(false)}
+              className="block text-white/80 hover:text-gold font-semibold py-2 tracking-wide"
+            >
+              PANEL ADMIN
             </Link>
             <hr className="my-4 border-gray-800" />
             {usuario ? (
