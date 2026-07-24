@@ -23,6 +23,7 @@ import {
   FaCheck
 } from 'react-icons/fa';
 import { useDestinationImages } from '../hooks/useDestinationImages';
+import { useFavorites } from '../contexts/FavoritesContext';
 
 // Destination data, kept for other info
 const DESTINOS_DATA = [
@@ -243,6 +244,23 @@ const DetalleDestino = () => {
   });
 
   const { images, heroImage, loading, refetch } = useDestinationImages(destino?.nombre || 'travel');
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  
+  const toggleFavorite = () => {
+    const favoriteItem = {
+      id: destino.id,
+      type: 'destino',
+      nombre: destino.nombre,
+      imagen: heroImage?.url || destino.imagen || '',
+      ubicacion: destino.ubicacion,
+      precio: destino.precio
+    };
+    if (isFavorite(destino.id, 'destino')) {
+      removeFavorite(destino.id, 'destino');
+    } else {
+      addFavorite(favoriteItem);
+    }
+  };
 
   if (!destino) {
     return (
@@ -499,10 +517,12 @@ const DetalleDestino = () => {
           </Link>
           <div className="flex gap-3">
             <button
-              onClick={() => refetch()}
-              className="bg-black/40 backdrop-blur-md text-white p-3 rounded-xl hover:bg-black/60 transition-all duration-300"
+              onClick={toggleFavorite}
+              className={`bg-black/40 backdrop-blur-md p-3 rounded-xl hover:bg-black/60 transition-all duration-300 ${
+                isFavorite(destino.id, 'destino') ? 'text-red-500' : 'text-white'
+              }`}
             >
-              <FaHeart />
+              <FaHeart className={isFavorite(destino.id, 'destino') ? 'fill-current' : ''} />
             </button>
             <button className="bg-black/40 backdrop-blur-md text-white p-3 rounded-xl hover:bg-black/60 transition-all duration-300">
               <FaShareAlt />

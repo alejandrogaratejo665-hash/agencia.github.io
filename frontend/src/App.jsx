@@ -11,6 +11,8 @@ import Nosotros from './pages/Nosotros';
 import Contacto from './pages/Contacto';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Favoritos from './pages/Favoritos';
+import Perfil from './pages/Perfil';
 
 function App() {
   return (
@@ -27,8 +29,8 @@ function App() {
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/perfil" element={<div className="p-8 text-center"><h1 className="text-3xl">Mi Perfil</h1></div>} />
-          <Route path="/favoritos" element={<div className="p-8 text-center"><h1 className="text-3xl">Mis Favoritos</h1></div>} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/favoritos" element={<Favoritos />} />
         </Routes>
       </main>
       <Footer />

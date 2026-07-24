@@ -80,7 +80,7 @@ const PAQUETES_DATA = [
     descuento: 0,
     calificacion: 4.9,
     numeroResenas: 321,
-    imagen: 'https://mitiqueteonline.com/_next/image?url=https%3A%2F%2Fmitiquete.s3.us-east-1.amazonaws.com%2Fmain-images%2Fblob-qz7eo2.blob&w=3840&q=75',
+    imagen: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600&auto=format&fit=crop',
     destacado: false,
     highlights: ['Valle del Cocora', 'Fincas Cafeteras', 'Salento', 'Filandia']
   }

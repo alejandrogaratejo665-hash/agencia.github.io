@@ -2,7 +2,20 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaMapMarkerAlt, FaStar, FaCheckCircle, FaCalendar, FaUsers, FaCamera, FaHeart, FaShareAlt, FaTimes, FaCalendarAlt, FaCheck } from 'react-icons/fa';
+import {
+  FaMapMarkerAlt,
+  FaStar,
+  FaCheckCircle,
+  FaCalendar,
+  FaUsers,
+  FaCamera,
+  FaHeart,
+  FaShareAlt,
+  FaTimes,
+  FaCalendarAlt,
+  FaCheck
+} from 'react-icons/fa';
+import { useFavorites } from '../contexts/FavoritesContext';
 
 const PAQUETES_DATA = [
   {
@@ -198,6 +211,23 @@ const DetallePaquete = () => {
     email: '',
     telefono: ''
   });
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  
+  const toggleFavorite = () => {
+    const favoriteItem = {
+      id: paquete.id,
+      type: 'paquete',
+      nombre: paquete.nombre,
+      imagen: paquete.imagen || '',
+      ubicacion: paquete.ubicacion,
+      precio: paquete.precio
+    };
+    if (isFavorite(paquete.id, 'paquete')) {
+      removeFavorite(paquete.id, 'paquete');
+    } else {
+      addFavorite(favoriteItem);
+    }
+  };
 
   if (!paquete) {
     return (
@@ -425,8 +455,13 @@ const DetallePaquete = () => {
             ← Volver
           </Link>
           <div className="flex gap-3">
-            <button className="bg-black/40 backdrop-blur-md text-white p-3 rounded-xl hover:bg-black/60 transition-all duration-300">
-              <FaHeart />
+            <button
+              onClick={toggleFavorite}
+              className={`bg-black/40 backdrop-blur-md p-3 rounded-xl hover:bg-black/60 transition-all duration-300 ${
+                isFavorite(paquete.id, 'paquete') ? 'text-red-500' : 'text-white'
+              }`}
+            >
+              <FaHeart className={isFavorite(paquete.id, 'paquete') ? 'fill-current' : ''} />
             </button>
             <button className="bg-black/40 backdrop-blur-md text-white p-3 rounded-xl hover:bg-black/60 transition-all duration-300">
               <FaShareAlt />
